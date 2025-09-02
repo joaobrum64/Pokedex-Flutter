@@ -1,0 +1,47 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+class TesteApi extends StatefulWidget {
+  const TesteApi({super.key});
+
+  @override
+  State<TesteApi> createState() => _TesteApiState();
+}
+
+class _TesteApiState extends State<TesteApi> {
+  String resultado = "Carregando...";
+
+  @override
+  void initState() {
+    super.initState();
+    carregar();
+  }
+
+  Future<void> carregar() async {
+    try {
+      final url = Uri.parse("https://pokeapi.co/api/v2/pokemon?limit=5");
+      final resp = await http.get(url);
+      if (resp.statusCode == 200) {
+        setState(() {
+          resultado = resp.body.substring(0, 200); // só 200 chars
+        });
+      } else {
+        setState(() {
+          resultado = "Erro status: ${resp.statusCode}";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        resultado = "Erro: $e";
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Teste API")),
+      body: Center(child: Text(resultado)),
+    );
+  }
+}
